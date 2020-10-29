@@ -1,0 +1,75 @@
+      *--------------------------------------------------------------*
+      *                                                              *
+      * OBJETIVO: CALCULAR A SIMULACAO DE EMPRESTIMOS FORNECIDOS     *
+      *           VIA SYSIN E EXIBIR RESULTADOS NA SYSOUT            *
+      *                                                              *
+      *--------------------------------------------------------------*
+
+
+      *--------------------------------------------------------------*
+       IDENTIFICATION                      DIVISION.
+      *--------------------------------------------------------------*
+       PROGRAM-ID.                         GPAZ0801.
+       AUTHOR.                             KARINA.
+      *--------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *--------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *--------------------------------------------------------------*
+       DATA                                DIVISION.
+      *--------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+       01  WS-REG-SYSIN.
+           05 WS-NUM-SIMULACAO             PIC 9(04).
+           05 WS-VAL-EMPRESTIMO            PIC 9(06)V99.
+           05 WS-JUROS                     PIC 9(02)V99.
+           05 WS-QTD-PARCELAS              PIC 9(02).
+       77  WS-VAL-PARC                     PIC 9(07)V99.
+       77  WS-VAL-TOTAL                    PIC 9(08)V99.
+       77  WS-CTLIDO                       PIC 9(04).
+       77  WS-CTPROC                       PIC 9(04).
+      *--------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *--------------------------------------------------------------*
+       0000-GPAZ9901.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL WS-REG-SYSIN = ALL "0"
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+       1000-INICIALIZAR.
+           MOVE 0 TO WS-CTLIDO
+                     WS-CTPROC
+           PERFORM 1500-LER-SYSIN
+           .
+       1500-LER-SYSIN.
+           ACCEPT WS-REG-SYSIN FROM SYSIN
+                  IF WS-REG-SYSIN NOT = ALL "0"
+                     COMPUTE WS-CTLIDO = WS-CTLIDO + 1
+                  END-IF
+           .
+       2000-PROCESSAR.
+           COMPUTE WS-VAL-PARC = ((WS-VAL-EMPRESTIMO * WS-JUROS) / 100)/
+                   (1 - 1 / (1 + WS-JUROS / 100) ** WS-QTD-PARCELAS)
+           COMPUTE WS-VAL-TOTAL = WS-VAL-PARC * WS-QTD-PARCELAS
+           DISPLAY "**************************************************"
+              DISPLAY "NUMERO DA SIMULACAO.....: " WS-NUM-SIMULACAO
+              DISPLAY "VALOR DO EMPRESTIMO.....: " WS-VAL-EMPRESTIMO
+              DISPLAY "JUROS...................: " WS-JUROS
+              DISPLAY "QTDE. DE PARCELAS.......: " WS-QTD-PARCELAS
+              DISPLAY "VALOR TOTAL.............: " WS-VAL-PARC
+           DISPLAY "**************************************************"
+           COMPUTE WS-CTPROC = WS-CTPROC + 1
+           PERFORM 1500-LER-SYSIN
+           .
+       3000-TERMINO.
+           DISPLAY "**************************************************"
+           DISPLAY "TOTAL DE SIMULACOES LIDAS........: " WS-CTLIDO
+           DISPLAY "TOTAL DE SIMULACOES PROCESSADAS..: " WS-CTPROC
+           DISPLAY "**************************************************"
+           DISPLAY "**************************************************"
+           DISPLAY "*   TERMINO NORMAL DE PROCESSAMENTO DO GPXXN01   *"
+           .
